@@ -1,5 +1,5 @@
 const mongoose=require('mongoose');
-const user=new mongoose.Schema(
+const userSchema=new mongoose.Schema(
     {Fname:{type:String,required:true},
     Lname:{type:String,required:true},
     Email:{type:String,required:true},
