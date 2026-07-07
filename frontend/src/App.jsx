@@ -4,6 +4,7 @@ import DeleteRecipe from './pages/DeleteRecipe'
 import Login from './pages/Login'
 import Recipes from './pages/Recipes'
 import Register from './pages/Register'
+import MyRecipes from './pages/MyRecipes'
 
 function App() {
   const linkStyle = ({ isActive }) => ({
@@ -38,7 +39,9 @@ function App() {
           <NavLink to="/register" style={linkStyle}>Register</NavLink>
           <NavLink to="/recipes" style={linkStyle}>Recipes</NavLink>
           <NavLink to="/add-recipe" style={linkStyle}>Add Recipe</NavLink>
+          <NavLink to="/my-recipe" style={linkStyle}>My Recipe</NavLink>
           <NavLink to="/delete-recipe" style={linkStyle}>Delete Recipe</NavLink>
+          
         </div>
       </nav>
 
@@ -55,6 +58,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/recipes" element={<Recipes />} />
           <Route path="/add-recipe" element={<AddRecipe />} />
+          <Route path="/my-recipe" element={<MyRecipes />} />
           <Route path="/delete-recipe" element={<DeleteRecipe />} />
         </Routes>
       </main>

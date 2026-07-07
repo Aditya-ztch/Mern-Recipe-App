@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getStoredRecipes } from './recipeStorage'
+import { getStoredRecipes, deleteRecipe } from './recipeStorage'
 
 const difficultyColors = {
   Easy: { bg: '#dcfce7', text: '#166534' },
@@ -7,7 +7,12 @@ const difficultyColors = {
   Hard: { bg: '#fee2e2', text: '#991b1b' },
 }
 
-function Recipes() {
+// Until real auth is wired up, the "current user" is just a name/id
+// stored on this device. Swap this out for your auth context/session
+// once login is in place (e.g. currentUser._id from a JWT or session).
+const CURRENT_USER = 'You'
+
+function MyRecipes({ currentUser = CURRENT_USER }) {
   const [recipes, setRecipes] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -22,28 +27,43 @@ function Recipes() {
     }
   }, [])
 
+  const myRecipes = recipes.filter((recipe) => {
+    const author = recipe.author
+    const authorName =
+      typeof author === 'string' ? author : author?.name || author?.username
+
+    // Recipes saved without an author are treated as belonging to
+    // whoever created them on this device.
+    return !author || authorName === currentUser
+  })
+
+  const handleDelete = (id) => {
+    deleteRecipe(id)
+  }
+
   return (
-    <div style={{ maxWidth: 960, margin: '0 auto', padding: 16 }}>
-      <h2 style={{ marginBottom: 8 }}>All Recipes</h2>
+    <div style={{ maxWidth: 960, margin: '0 auto', padding: 16, fontFamily: 'system-ui, sans-serif' }}>
+      <h2 style={{ marginBottom: 8 }}>Your Recipes</h2>
       <p style={{ marginTop: 0, opacity: 0.8 }}>
-        Here are all the recipes added through the add recipe form.
+        Recipes you've created and saved.
       </p>
 
       <input
         type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Search recipes by title"
+        placeholder="Search your recipes by title"
         style={{
           width: '100%',
           padding: '10px 12px',
           borderRadius: 6,
           border: '1px solid #ccc',
           marginBottom: 16,
+          boxSizing: 'border-box',
         }}
       />
 
-      {recipes.length === 0 ? (
+      {myRecipes.length === 0 ? (
         <div
           style={{
             padding: 20,
@@ -52,11 +72,11 @@ function Recipes() {
             background: '#fff',
           }}
         >
-          No recipes added yet.
+          You haven't created any recipes yet.
         </div>
       ) : (
         <div style={{ display: 'grid', gap: 12 }}>
-          {recipes
+          {myRecipes
             .filter((recipe) =>
               (recipe.Title || '').toLowerCase().includes(searchTerm.toLowerCase()),
             )
@@ -65,10 +85,11 @@ function Recipes() {
                 bg: '#e5e7eb',
                 text: '#374151',
               }
+              const recipeId = recipe._id || recipe.id
 
               return (
                 <div
-                  key={recipe._id || recipe.id}
+                  key={recipeId}
                   style={{
                     display: 'flex',
                     gap: 16,
@@ -126,7 +147,7 @@ function Recipes() {
                     </p>
 
                     {Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0 && (
-                      <div style={{ margin: '0 0 8px' }}>
+                      <div style={{ margin: '0 0 10px' }}>
                         <strong style={{ fontSize: 13, color: '#6b7280' }}>
                           Ingredients:
                         </strong>
@@ -141,11 +162,22 @@ function Recipes() {
                       </div>
                     )}
 
-                    {recipe.author && (
-                      <p style={{ margin: 0, fontSize: 12, color: '#9ca3af' }}>
-                        By: {recipe.author.name || recipe.author.username || recipe.author}
-                      </p>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(recipeId)}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: 6,
+                        border: '1px solid #fca5a5',
+                        background: '#fff',
+                        color: '#b00020',
+                        cursor: 'pointer',
+                        fontSize: 13,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               )
@@ -156,4 +188,4 @@ function Recipes() {
   )
 }
 
-export default Recipes
+export default MyRecipes

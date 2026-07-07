@@ -1,34 +1,61 @@
 import { useState } from 'react'
 import { addRecipe } from './recipeStorage'
 
+const emptyIngredient = { name: '', quantity: '' }
+
 function AddRecipe() {
-  const [recipeName, setRecipeName] = useState('')
-  const [recipeType, setRecipeType] = useState('')
-  const [recipeDescription, setRecipeDescription] = useState('')
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [difficulty, setDifficulty] = useState('Easy')
+  const [image, setImage] = useState('')
+  const [ingredients, setIngredients] = useState([{ ...emptyIngredient }])
 
   const [error, setError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+
+  const updateIngredient = (index, field, value) => {
+    setIngredients((prev) =>
+      prev.map((ing, i) => (i === index ? { ...ing, [field]: value } : ing)),
+    )
+  }
+
+  const addIngredientRow = () => {
+    setIngredients((prev) => [...prev, { ...emptyIngredient }])
+  }
+
+  const removeIngredientRow = (index) => {
+    setIngredients((prev) => prev.filter((_, i) => i !== index))
+  }
 
   const onSubmit = (e) => {
     e.preventDefault()
     setError('')
     setSuccessMessage('')
 
-    if (!recipeName.trim()) return setError('Recipe Name is required')
-    if (!recipeType.trim()) return setError('Recipe Type is required')
-    if (!recipeDescription.trim())
-      return setError('Recipe Description is required')
+    if (!title.trim()) return setError('Title is required')
+    if (!description.trim()) return setError('Description is required')
+
+    const cleanedIngredients = ingredients
+      .map((ing) => ({ name: ing.name.trim(), quantity: ing.quantity.trim() }))
+      .filter((ing) => ing.name)
+
+    if (cleanedIngredients.length === 0)
+      return setError('At least one ingredient is required')
 
     const payload = {
-      recipeName: recipeName.trim(),
-      recipeType: recipeType.trim(),
-      recipeDescription: recipeDescription.trim(),
+      Title: title.trim(),
+      description: description.trim(),
+      ingredients: cleanedIngredients,
+      difficulty,
+      image: image.trim(),
     }
 
     addRecipe(payload)
-    setRecipeName('')
-    setRecipeType('')
-    setRecipeDescription('')
+    setTitle('')
+    setDescription('')
+    setDifficulty('Easy')
+    setImage('')
+    setIngredients([{ ...emptyIngredient }])
     setSuccessMessage('Recipe saved successfully!')
   }
 
@@ -44,11 +71,11 @@ function AddRecipe() {
 
       <form onSubmit={onSubmit} style={{ display: 'grid', gap: 12 }}>
         <label style={{ display: 'grid', gap: 6 }}>
-          <span>Recipe Name</span>
+          <span>Title</span>
           <input
             type="text"
-            value={recipeName}
-            onChange={(e) => setRecipeName(e.target.value)}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Chicken Curry"
             autoComplete="off"
             style={{ padding: 10, borderRadius: 6, border: '1px solid #ccc' }}
@@ -56,22 +83,10 @@ function AddRecipe() {
         </label>
 
         <label style={{ display: 'grid', gap: 6 }}>
-          <span>Recipe Type</span>
-          <input
-            type="text"
-            value={recipeType}
-            onChange={(e) => setRecipeType(e.target.value)}
-            placeholder="e.g. Dinner, Vegetarian, Dessert"
-            autoComplete="off"
-            style={{ padding: 10, borderRadius: 6, border: '1px solid #ccc' }}
-          />
-        </label>
-
-        <label style={{ display: 'grid', gap: 6 }}>
-          <span>Recipe Description</span>
+          <span>Description</span>
           <textarea
-            value={recipeDescription}
-            onChange={(e) => setRecipeDescription(e.target.value)}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             placeholder="Write a short description..."
             rows={5}
             style={{
@@ -82,6 +97,102 @@ function AddRecipe() {
             }}
           />
         </label>
+
+        <label style={{ display: 'grid', gap: 6 }}>
+          <span>Difficulty</span>
+          <select
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
+            style={{ padding: 10, borderRadius: 6, border: '1px solid #ccc' }}
+          >
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </label>
+
+        <label style={{ display: 'grid', gap: 6 }}>
+          <span>Image URL</span>
+          <input
+            type="text"
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+            placeholder="https://example.com/image.jpg"
+            autoComplete="off"
+            style={{ padding: 10, borderRadius: 6, border: '1px solid #ccc' }}
+          />
+        </label>
+
+        <div style={{ display: 'grid', gap: 8 }}>
+          <span>Ingredients</span>
+
+          {ingredients.map((ing, index) => (
+            <div
+              key={index}
+              style={{ display: 'flex', gap: 8, alignItems: 'center' }}
+            >
+              <input
+                type="text"
+                value={ing.name}
+                onChange={(e) => updateIngredient(index, 'name', e.target.value)}
+                placeholder="Ingredient name"
+                autoComplete="off"
+                style={{
+                  flex: 2,
+                  padding: 10,
+                  borderRadius: 6,
+                  border: '1px solid #ccc',
+                }}
+              />
+              <input
+                type="text"
+                value={ing.quantity}
+                onChange={(e) =>
+                  updateIngredient(index, 'quantity', e.target.value)
+                }
+                placeholder="Quantity"
+                autoComplete="off"
+                style={{
+                  flex: 1,
+                  padding: 10,
+                  borderRadius: 6,
+                  border: '1px solid #ccc',
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => removeIngredientRow(index)}
+                disabled={ingredients.length === 1}
+                style={{
+                  padding: '10px 12px',
+                  borderRadius: 6,
+                  border: '1px solid #ccc',
+                  background: '#fff',
+                  cursor: ingredients.length === 1 ? 'not-allowed' : 'pointer',
+                  color: '#b00020',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={addIngredientRow}
+            style={{
+              padding: 10,
+              borderRadius: 6,
+              border: '1px dashed #2563eb',
+              background: '#fff',
+              color: '#2563eb',
+              cursor: 'pointer',
+              fontWeight: 600,
+            }}
+          >
+            + Add Ingredient
+          </button>
+        </div>
 
         {error ? (
           <div role="alert" style={{ color: '#b00020', fontSize: 14 }}>
@@ -113,4 +224,3 @@ function AddRecipe() {
 }
 
 export default AddRecipe
-

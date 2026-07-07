@@ -42,6 +42,11 @@ function NavBar() {
               <NavLink to="/add-recipe" className={linkClass}>
                 AddRecipe
               </NavLink>
+            </li> 
+             <li className="nav-item">
+              <NavLink to="/user-recipe" className={linkClass}>
+                Your Recipe
+              </NavLink>
             </li>
 
             <li className="nav-item">
