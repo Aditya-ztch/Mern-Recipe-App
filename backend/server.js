@@ -14,7 +14,9 @@ DBConnect(); //connecting to Db
 
 //router connection
 const UserRouter=require('./Router/UserRouter');
+const RecipeRouter=require('./Router/RecipeRouter');
 app.use("/api",UserRouter);
+app.use("/api",RecipeRouter);
 
 app.listen(process.env.PORT,()=>{
     console.log("Server running successfully :",process.env.PORT);
