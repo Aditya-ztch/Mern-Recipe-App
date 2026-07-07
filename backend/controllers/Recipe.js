@@ -5,7 +5,7 @@ const CreateRecipe=async (req,res)=>{
     const {Title,description,ingredients,difficulty,image }=req.body;
     const authorId=req.params.aid;
     try {
-        const CreatedRecipe=await RecipeModel.insertOne({
+        const CreatedRecipe=await RecipeModel.create({
         Title,
         description,
         ingredients,
@@ -55,7 +55,7 @@ const DeleteUserRecipe=async(req,res)=>{
             author:authorId
          });
          if(!Recipe){
-             res.status(404).json({message:"Recipe Not Found"});
+             return res.status(404).json({message:"Recipe Not Found"});
          }
      
         res.status(200).json({message:"Recipe Deleted Successfully",Recipe})
@@ -77,7 +77,7 @@ const SearchRecipe=async(req,res)=>{
     {"ingredients.name": { $regex: searchData, $options: "i" } }
   ]
 });
-  if(FoundRecipe){
+  if(FoundRecipe.length){
     res.status(200).json({message:"Search sucessfull",FoundRecipe});
   } 
   else{

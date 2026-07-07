@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { registerUser } from '../api'
 
 function Register() {
   const [firstName, setFirstName] = useState('')
@@ -15,7 +16,7 @@ function Register() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
@@ -55,22 +56,25 @@ function Register() {
       return
     }
 
-    // UI-only for now. Replace with real API call when backend is ready.
     const payload = {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      country: country.trim(),
-      city: city.trim(),
-      phone: phone.trim(),
-      email: email.trim(),
+      Fname: firstName.trim(),
+      Lname: lastName.trim(),
+      Country: country.trim(),
+      City: city.trim(),
+      Phone: phone.trim(),
+      Email: email.trim(),
       Password:Password.trim(),
       Gender:Gender
-      
     }
 
-    console.log('Register payload:', payload)
-    toast.success('Registration successful!')
-    navigate('/')
+    try {
+      await registerUser(payload)
+      toast.success('Registration successful! Please login.')
+      navigate('/login')
+    } catch (err) {
+      setError(err.message)
+      toast.error(err.message)
+    }
   }
 
   return (
@@ -249,4 +253,3 @@ function Register() {
 }
 
 export default Register
-
