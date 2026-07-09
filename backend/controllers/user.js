@@ -3,17 +3,18 @@ const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
 //register user
 const RegisterUser=async(req,res)=>{
-    const{Fname,Lname,Email,Password,Dob,Gender,Address}=req.body;
+    const{Fname,Lname,Email,Password,Phone,Gender,City,Country}=req.body;
     const Hashed=await bcrypt.hash(Password,10)
     try {
-        const Registered=await users.insertOne({
+        const Registered=await users.create({
             Fname,
             Lname,
             Email,
             Password:Hashed,
-            Dob,
             Gender,
-            Address
+            Phone,
+            City,
+            Country
         });
         res.status(200).json({message:"User Registered Successfully",Registered});
     } catch (error) {

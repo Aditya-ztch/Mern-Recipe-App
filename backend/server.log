@@ -1,0 +1,7 @@
+
+> backend@1.0.0 start
+> node server.js
+
+◇ injected env (4) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+Server running successfully : 3000
+Database Connected Successfully

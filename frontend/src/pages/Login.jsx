@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { loginUser, saveAuthUser } from '../api'
 
 function Login() {
   const [identifier, setIdentifier] = useState('') // username or email
@@ -23,15 +24,19 @@ function Login() {
       return
     }
 
-    const payload = { identifier: identifier.trim(), password }
+    const payload = { email: identifier.trim(), password }
 
     try {
-      console.log('Login payload:', payload)
+      const data = await loginUser(payload)
+      saveAuthUser({
+        user: data.FoundUser,
+        token: data.token,
+      })
       toast.success('Login successful!')
       navigate('/')
     } catch (err) {
-      setError('Login failed. Please try again.')
-      toast.error('Login failed. Please try again.')
+      setError(err.message)
+      toast.error(err.message)
     }
   }
 
@@ -93,4 +98,3 @@ function Login() {
 }
 
 export default Login
-

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { addRecipe } from './recipeStorage'
+import { createRecipe, getAuthUser } from '../api'
 
 const emptyIngredient = { name: '', quantity: '' }
 
@@ -27,13 +27,19 @@ function AddRecipe() {
     setIngredients((prev) => prev.filter((_, i) => i !== index))
   }
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setSuccessMessage('')
 
     if (!title.trim()) return setError('Title is required')
     if (!description.trim()) return setError('Description is required')
+
+    const auth = getAuthUser()
+
+    if (!auth?.user?._id) {
+      return setError('Please login before adding a recipe')
+    }
 
     const cleanedIngredients = ingredients
       .map((ing) => ({ name: ing.name.trim(), quantity: ing.quantity.trim() }))
@@ -50,13 +56,17 @@ function AddRecipe() {
       image: image.trim(),
     }
 
-    addRecipe(payload)
-    setTitle('')
-    setDescription('')
-    setDifficulty('Easy')
-    setImage('')
-    setIngredients([{ ...emptyIngredient }])
-    setSuccessMessage('Recipe saved successfully!')
+    try {
+      await createRecipe(auth.user._id, payload)
+      setTitle('')
+      setDescription('')
+      setDifficulty('Easy')
+      setImage('')
+      setIngredients([{ ...emptyIngredient }])
+      setSuccessMessage('Recipe saved successfully!')
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
   return (
