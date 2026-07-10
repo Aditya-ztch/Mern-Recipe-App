@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { loginUser, saveAuthUser } from '../api'
+import { loginUser } from '../api'
+import { useAuth } from '../context/AuthContext'
 
 function Login() {
   const [identifier, setIdentifier] = useState('') // username or email
@@ -9,6 +10,7 @@ function Login() {
 
   const [error, setError] = useState('')
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -28,12 +30,12 @@ function Login() {
 
     try {
       const data = await loginUser(payload)
-      saveAuthUser({
+      login({
         user: data.FoundUser,
         token: data.token,
       })
       toast.success('Login successful!')
-      navigate('/')
+      navigate('/recipes')
     } catch (err) {
       setError(err.message)
       toast.error(err.message)
@@ -53,7 +55,7 @@ function Login() {
             name="identifier"
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
-            placeholder="e.g. rishi or rishi@example.com"
+            placeholder="e.g. you@example.com"
             autoComplete="username"
             style={{ padding: 10, borderRadius: 6, border: '1px solid #ccc' }}
           />
@@ -91,6 +93,21 @@ function Login() {
           }}
         >
           Login
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate('/register')}
+          style={{
+            padding: 12,
+            borderRadius: 6,
+            border: 'none',
+            cursor: 'pointer',
+            background: '#45e448',
+            color: 'white',
+            fontWeight: 600,
+          }}
+        >
+          New User? Register
         </button>
       </form>
     </div>

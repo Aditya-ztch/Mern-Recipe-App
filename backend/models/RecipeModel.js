@@ -2,12 +2,7 @@ const mongoose=require('mongoose');
 const recipeSchema=new mongoose.Schema({
     Title:{type:String,required:true},
     description:{type:String,required:true},
-    ingredients:[
-        {
-            name:String,
-            quantity:String
-        }
-    ],
+     ingredients: [{ type: String }],
     difficulty:{
         type:String,enum:['Easy','Medium','Hard']
     },

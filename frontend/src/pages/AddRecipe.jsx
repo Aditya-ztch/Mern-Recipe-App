@@ -1,26 +1,24 @@
 import { useState } from 'react'
 import { createRecipe, getAuthUser } from '../api'
 
-const emptyIngredient = { name: '', quantity: '' }
-
 function AddRecipe() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [difficulty, setDifficulty] = useState('Easy')
   const [image, setImage] = useState('')
-  const [ingredients, setIngredients] = useState([{ ...emptyIngredient }])
+  const [ingredients, setIngredients] = useState([''])
 
   const [error, setError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
-  const updateIngredient = (index, field, value) => {
+  const updateIngredient = (index, value) => {
     setIngredients((prev) =>
-      prev.map((ing, i) => (i === index ? { ...ing, [field]: value } : ing)),
+      prev.map((ing, i) => (i === index ? value : ing)),
     )
   }
 
   const addIngredientRow = () => {
-    setIngredients((prev) => [...prev, { ...emptyIngredient }])
+    setIngredients((prev) => [...prev, ''])
   }
 
   const removeIngredientRow = (index) => {
@@ -42,8 +40,8 @@ function AddRecipe() {
     }
 
     const cleanedIngredients = ingredients
-      .map((ing) => ({ name: ing.name.trim(), quantity: ing.quantity.trim() }))
-      .filter((ing) => ing.name)
+      .map((ing) => ing.trim())
+      .filter((ing) => ing)
 
     if (cleanedIngredients.length === 0)
       return setError('At least one ingredient is required')
@@ -62,7 +60,7 @@ function AddRecipe() {
       setDescription('')
       setDifficulty('Easy')
       setImage('')
-      setIngredients([{ ...emptyIngredient }])
+      setIngredients([''])
       setSuccessMessage('Recipe saved successfully!')
     } catch (err) {
       setError(err.message)
@@ -143,24 +141,9 @@ function AddRecipe() {
             >
               <input
                 type="text"
-                value={ing.name}
-                onChange={(e) => updateIngredient(index, 'name', e.target.value)}
+                value={ing}
+                onChange={(e) => updateIngredient(index, e.target.value)}
                 placeholder="Ingredient name"
-                autoComplete="off"
-                style={{
-                  flex: 2,
-                  padding: 10,
-                  borderRadius: 6,
-                  border: '1px solid #ccc',
-                }}
-              />
-              <input
-                type="text"
-                value={ing.quantity}
-                onChange={(e) =>
-                  updateIngredient(index, 'quantity', e.target.value)
-                }
-                placeholder="Quantity"
                 autoComplete="off"
                 style={{
                   flex: 1,

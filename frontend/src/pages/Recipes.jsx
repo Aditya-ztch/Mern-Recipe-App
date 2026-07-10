@@ -100,6 +100,16 @@ function RecipeMessage({ children }) {
   )
 }
 
+function ingredientLabel(ing) {
+  // Supports plain string ingredients (current model) and older
+  // { name, quantity } objects, in case any old data is still around.
+  if (typeof ing === 'string') return ing
+  if (ing && typeof ing === 'object') {
+    return ing.quantity ? `${ing.name} - ${ing.quantity}` : ing.name
+  }
+  return ''
+}
+
 export function RecipeCard({ recipe, action }) {
   const difficultyStyle = difficultyColors[recipe.difficulty] || {
     bg: '#e5e7eb',
@@ -171,9 +181,8 @@ export function RecipeCard({ recipe, action }) {
             </strong>
             <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
               {recipe.ingredients.map((ing, idx) => (
-                <li key={`${ing.name}-${idx}`} style={{ fontSize: 14 }}>
-                  {ing.name}
-                  {ing.quantity ? ` - ${ing.quantity}` : ''}
+                <li key={idx} style={{ fontSize: 14 }}>
+                  {ingredientLabel(ing)}
                 </li>
               ))}
             </ul>
